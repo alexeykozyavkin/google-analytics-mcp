@@ -179,7 +179,7 @@ async def oauth_protected_resource(_: Request) -> JSONResponse:
     return JSONResponse(
         {
             "resource": configuration.audience,
-            "authorization_servers": [configuration.issuer.rstrip("/")],
+            "authorization_servers": [configuration.issuer],
             "scopes_supported": [configuration.scope],
             "bearer_methods_supported": ["header"],
             "resource_name": "Google Analytics MCP",
