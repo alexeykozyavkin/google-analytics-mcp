@@ -170,6 +170,41 @@ Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
 Launch Gemini Code Assist or Gemini CLI and type `/mcp`. You should see
 `analytics-mcp` listed in the results.
 
+## Deploy a remote Streamable HTTP server on Railway
+
+This fork includes a Railway entry point that exposes the same tools over
+Streamable HTTP at `/mcp`. The upstream stdio entry point remains unchanged.
+
+1. Base64-encode a Google service-account JSON key and add the result to the
+   Railway service as `GOOGLE_APPLICATION_CREDENTIALS_BASE64`.
+2. Add a long random value as `MCP_AUTH_TOKEN`.
+3. Deploy the repository. Railway detects the root `Dockerfile` and uses
+   `/health` as the deployment health check.
+4. Generate a public Railway domain. The MCP URL is:
+
+   ```text
+   https://YOUR-SERVICE.up.railway.app/mcp
+   ```
+
+5. Configure the MCP client to send this header:
+
+   ```text
+   Authorization: Bearer YOUR_MCP_AUTH_TOKEN
+   ```
+
+For a short-lived local connectivity test without authentication, explicitly
+set `ALLOW_UNAUTHENTICATED_MCP=true`. Do not leave an Analytics endpoint
+publicly accessible without authentication.
+
+To test locally with an existing credentials file:
+
+```shell
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json \
+MCP_AUTH_TOKEN=replace-me \
+PORT=8080 \
+python -m analytics_mcp.remote_server
+```
+
 Here are some sample prompts to get you started:
 
 - Ask what the server can do:

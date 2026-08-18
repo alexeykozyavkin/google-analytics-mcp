@@ -67,3 +67,10 @@ pylintrc
 pylintrc.test
 
 .agents/skills
+
+# Local credentials and environment files
+*.json
+!skills-lock.json
+!railway.json
+.env
+.env.*
