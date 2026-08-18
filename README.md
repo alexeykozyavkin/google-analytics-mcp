@@ -177,24 +177,42 @@ Streamable HTTP at `/mcp`. The upstream stdio entry point remains unchanged.
 
 1. Base64-encode a Google service-account JSON key and add the result to the
    Railway service as `GOOGLE_APPLICATION_CREDENTIALS_BASE64`.
-2. Add a long random value as `MCP_AUTH_TOKEN`.
+2. Choose one remote authentication mode:
+
+   - For ChatGPT and other OAuth MCP clients, create an Auth0 API whose
+     identifier is the public Railway origin, add an `analytics:read` scope,
+     and set these Railway variables:
+
+     ```text
+     AUTH0_DOMAIN=YOUR-TENANT.us.auth0.com
+     AUTH0_AUDIENCE=https://YOUR-SERVICE.up.railway.app
+     AUTH0_SCOPE=analytics:read
+     ```
+
+     The server publishes OAuth protected-resource metadata and verifies each
+     Auth0 access token's signature, issuer, audience, expiry, and scope.
+
+   - For MCP clients that support custom request headers, add a long random
+     value as `MCP_AUTH_TOKEN`.
+
 3. Deploy the repository. Railway detects the root `Dockerfile` and uses
    `/health` as the deployment health check.
-4. Generate a public Railway domain. The MCP URL is:
+4. Generate a public Railway domain. The Streamable HTTP MCP URL is:
 
    ```text
    https://YOUR-SERVICE.up.railway.app/mcp
    ```
 
-5. Configure the MCP client to send this header:
+5. Static-token clients must send this header:
 
    ```text
    Authorization: Bearer YOUR_MCP_AUTH_TOKEN
    ```
 
-For a short-lived local connectivity test without authentication, explicitly
-set `ALLOW_UNAUTHENTICATED_MCP=true`. Do not leave an Analytics endpoint
-publicly accessible without authentication.
+When Auth0 variables and `MCP_AUTH_TOKEN` are both present, Auth0 takes
+precedence. For a short-lived local connectivity test without authentication,
+explicitly set `ALLOW_UNAUTHENTICATED_MCP=true`. Do not leave an Analytics
+endpoint publicly accessible without authentication.
 
 To test locally with an existing credentials file:
 
